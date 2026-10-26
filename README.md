@@ -15,7 +15,11 @@ git status
 確認哪些檔案被修改。
 
 git add backend/app.py
+git add README.md
 告訴 Git 要提交這支 Python 程式。
+
+git add -A
+把所有變更加入暫存區（包含刪除和新增的檔案）
 
 git commit -m "Update Python code"
 記錄這一次的修改。
