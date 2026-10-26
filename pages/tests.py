@@ -18,21 +18,62 @@ def course_data(**overrides):
 
 
 class TimetableViewTests(TestCase):
-    def test_shows_course(self):
+    def test_course_fills_every_period(self):
         Course.objects.create(**course_data())
         response = self.client.get(reverse("timetable"))
-        self.assertContains(response, "微積分")
-        self.assertContains(response, "A101")
-        self.assertContains(response, "09:10–11:00")
-        self.assertContains(response, 'rowspan="2"')
+        # 第 2–3 節的課，兩格都要顯示
+        self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+        self.assertNotContains(response, "教室：")
+        self.assertNotContains(response, "教師：")
+        self.assertContains(response, '<div class="text-muted">09:10–11:00</div>', count=2, html=True)
+        self.assertNotContains(response, "rowspan")
 
-    def test_course_across_lunch_spans_lunch_row(self):
-        Course.objects.create(**course_data(start_period=4, end_period=5))
+    def test_place_skips_blank_fields(self):
+        course = Course(**course_data(teacher=""))
+        self.assertEqual(course.place, "A101")
+        course.classroom = ""
+        self.assertEqual(course.place, "")
+
+    def test_cell_links_to_edit_without_buttons(self):
+        course = Course.objects.create(**course_data())
         response = self.client.get(reverse("timetable"))
-        self.assertContains(response, 'rowspan="3"')
+        self.assertContains(response, reverse("course_update", args=[course.pk]), count=2)
+        self.assertNotContains(response, reverse("course_delete", args=[course.pk]))
+
+    def test_no_lunch_row(self):
+        Course.objects.create(**course_data(start_period=4, end_period=5))
+        for url in (reverse("timetable"), reverse("timetable_print")):
+            response = self.client.get(url)
+            self.assertNotContains(response, "午休")
+            self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+
+
+class TimetablePrintViewTests(TestCase):
+    def test_print_page_shows_grid_without_actions(self):
+        course = Course.objects.create(**course_data())
+        response = self.client.get(reverse("timetable_print"))
+        self.assertContains(response, "星期一")
+        self.assertContains(response, "第 9 節")
+        self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+        self.assertNotContains(response, reverse("course_update", args=[course.pk]))
+        self.assertNotContains(response, reverse("course_delete", args=[course.pk]))
+
+    def test_timetable_links_to_print_page(self):
+        response = self.client.get(reverse("timetable"))
+        self.assertContains(response, reverse("timetable_print"))
 
 
 class CourseCreateTests(TestCase):
+    def test_form_defaults(self):
+        response = self.client.get(reverse("course_create"))
+        self.assertContains(response, '<option value="1" selected>星期一</option>', html=True)
+        self.assertContains(response, '<option value="1" selected>第 1 節</option>', count=2, html=True)
+        self.assertContains(response, "節次")
+        self.assertNotContains(response, "開始節次")
+        self.assertNotContains(response, "---------")
+        self.assertNotContains(response, "（08:10–09:00）")
+        self.assertNotContains(response, "刪除這門課")
+
     def test_create(self):
         response = self.client.post(reverse("course_create"), course_data())
         self.assertRedirects(response, reverse("timetable"))
@@ -62,6 +103,12 @@ class CourseCreateTests(TestCase):
 
 
 class CourseUpdateTests(TestCase):
+    def test_edit_page_has_delete_button(self):
+        course = Course.objects.create(**course_data())
+        response = self.client.get(reverse("course_update", args=[course.pk]))
+        self.assertContains(response, "刪除這門課")
+        self.assertContains(response, reverse("course_delete", args=[course.pk]))
+
     def test_update_without_self_conflict(self):
         course = Course.objects.create(**course_data())
         response = self.client.post(

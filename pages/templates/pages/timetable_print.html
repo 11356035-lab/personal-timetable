@@ -1,0 +1,14 @@
+{% extends "pages/base.html" %}
+
+{% block title %}列印課表 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+  <a class="btn btn-outline-secondary" href="{% url 'timetable' %}">← 返回課表</a>
+  <button type="button" class="btn btn-primary" onclick="window.print()">列印</button>
+</div>
+
+<h1 class="h3 text-center mb-3">個人課表</h1>
+
+{% include "pages/_timetable_grid.html" with show_actions=False %}
+{% endblock %}

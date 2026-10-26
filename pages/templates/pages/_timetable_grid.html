@@ -1,0 +1,42 @@
+{# 課表表格；show_actions 為真時，點課程格子可進入編輯頁 #}
+<table class="table table-bordered bg-white text-center timetable">
+  <thead class="table-light">
+    <tr>
+      <th class="period-col">節次</th>
+      {% for value, label in weekdays %}
+        <th>{{ label }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+      <tr>
+        <th class="period-col">
+          第 {{ row.period }} 節<br>
+          <small class="text-muted">{{ row.start_time }}–{{ row.end_time }}</small>
+        </th>
+        {% for course in row.cells %}
+          {% if course %}
+            <td class="course{% if show_actions %} clickable{% endif %}"
+                title="{{ course.name }}　{{ course.start_time }}–{{ course.end_time }}{% if course.place %}　{{ course.place }}{% endif %}{% if show_actions %}（點一下編輯）{% endif %}">
+              {# 內容浮在格子上，不影響表格大小 #}
+              <div class="course-content">
+                <div class="fw-bold">
+                  {% if show_actions %}
+                    <a class="stretched-link text-reset text-decoration-none" href="{% url 'course_update' course.pk %}">{{ course.name }}</a>
+                  {% else %}
+                    {{ course.name }}
+                  {% endif %}
+                </div>
+                <div class="text-muted">{{ course.start_time }}–{{ course.end_time }}</div>
+                {% if course.place %}<div>{{ course.place }}</div>{% endif %}
+              </div>
+            </td>
+          {% else %}
+            <td></td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

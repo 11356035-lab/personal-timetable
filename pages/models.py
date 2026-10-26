@@ -15,10 +15,7 @@ PERIODS = {
 }
 MAX_PERIOD = max(PERIODS)
 
-PERIOD_CHOICES = [
-    (number, f"第 {number} 節（{start}–{end}）")
-    for number, (start, end) in PERIODS.items()
-]
+PERIOD_CHOICES = [(number, f"第 {number} 節") for number in PERIODS]
 
 
 class Course(models.Model):
@@ -30,9 +27,11 @@ class Course(models.Model):
         FRIDAY = 5, "星期五"
 
     name = models.CharField("課程名稱", max_length=100)
-    weekday = models.PositiveSmallIntegerField("星期", choices=Weekday.choices)
-    start_period = models.PositiveSmallIntegerField("開始節次", choices=PERIOD_CHOICES)
-    end_period = models.PositiveSmallIntegerField("結束節次", choices=PERIOD_CHOICES)
+    weekday = models.PositiveSmallIntegerField(
+        "星期", choices=Weekday.choices, default=Weekday.MONDAY
+    )
+    start_period = models.PositiveSmallIntegerField("開始節次", choices=PERIOD_CHOICES, default=1)
+    end_period = models.PositiveSmallIntegerField("結束節次", choices=PERIOD_CHOICES, default=1)
     classroom = models.CharField("教室", max_length=50, blank=True)
     teacher = models.CharField("授課教師", max_length=50, blank=True)
 
@@ -63,8 +62,9 @@ class Course(models.Model):
         return PERIODS[self.end_period][1]
 
     @property
-    def period_span(self):
-        return self.end_period - self.start_period + 1
+    def place(self):
+        """教室和教師，中間空一格；沒填的不顯示"""
+        return " ".join(part for part in (self.classroom, self.teacher) if part)
 
     def period_label(self):
         if self.start_period == self.end_period:

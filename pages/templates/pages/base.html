@@ -8,8 +8,32 @@
   <style>
     .timetable th, .timetable td { vertical-align: middle; }
     .timetable .period-col { width: 8rem; }
-    .timetable td.course { background: #e7f1ff; }
-    .timetable .lunch { background: #f8f9fa; color: #6c757d; font-size: .875rem; }
+    .timetable td.course { background: #e7f1ff; position: relative; }
+    .timetable td.clickable { cursor: pointer; }
+    .timetable td.clickable:hover { background: #cfe2ff; }
+    /* 課程內容浮在格子上、不佔版面，加入課程後表格大小不變 */
+    .timetable .course-content {
+      position: absolute; inset: 0; padding: .25rem .4rem;
+      display: flex; flex-direction: column; justify-content: center;
+      font-size: .8rem; line-height: 1.2; overflow: hidden;
+    }
+    .timetable .course-content > div {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      body { background: #fff !important; }
+      .navbar, .no-print, .alert { display: none !important; }
+      main.container { max-width: none; padding: 0; }
+      .timetable { font-size: 11pt; margin: 0; }
+      .timetable th, .timetable td { padding: .3rem; }
+      .timetable .course-content { font-size: 8.5pt; padding: .15rem .3rem; }
+      .timetable td.course {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
   </style>
 </head>
 <body class="bg-light">
