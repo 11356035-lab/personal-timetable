@@ -1,0 +1,56 @@
+{% extends "pages/base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">本週課表</h1>
+  <a class="btn btn-primary" href="{% url 'course_create' %}">＋ 新增課程</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-bordered bg-white text-center timetable">
+    <thead class="table-light">
+      <tr>
+        <th class="period-col">節次</th>
+        {% for value, label in weekdays %}
+          <th>{{ label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        {% if row.is_lunch %}
+          <tr class="lunch">
+            <th class="lunch">午休<br>12:00–13:30</th>
+            {% for day in row.cells %}<td class="lunch"></td>{% endfor %}
+          </tr>
+        {% else %}
+          <tr>
+            <th class="period-col">
+              第 {{ row.period }} 節<br>
+              <small class="text-muted">{{ row.start_time }}–{{ row.end_time }}</small>
+            </th>
+            {% for cell in row.cells %}
+              {% if cell.course %}
+                {% with course=cell.course %}
+                <td class="course" rowspan="{{ cell.rowspan }}">
+                  <div class="fw-bold">{{ course.name }}</div>
+                  <div class="small text-muted">{{ course.start_time }}–{{ course.end_time }}</div>
+                  {% if course.classroom %}<div class="small">教室：{{ course.classroom }}</div>{% endif %}
+                  {% if course.teacher %}<div class="small">教師：{{ course.teacher }}</div>{% endif %}
+                  <div class="mt-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'course_update' course.pk %}">修改</a>
+                    <a class="btn btn-sm btn-outline-danger" href="{% url 'course_delete' course.pk %}">刪除</a>
+                  </div>
+                </td>
+                {% endwith %}
+              {% else %}
+                <td></td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

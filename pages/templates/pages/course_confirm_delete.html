@@ -1,0 +1,28 @@
+{% extends "pages/base.html" %}
+
+{% block title %}刪除課程 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h1 class="h4 mb-3">確定要刪除這門課嗎？</h1>
+        <dl class="row mb-4">
+          <dt class="col-4">課程名稱</dt><dd class="col-8">{{ object.name }}</dd>
+          <dt class="col-4">時間</dt>
+          <dd class="col-8">{{ object.get_weekday_display }} {{ object.period_label }}（{{ object.start_time }}–{{ object.end_time }}）</dd>
+          <dt class="col-4">教室</dt><dd class="col-8">{{ object.classroom|default:"—" }}</dd>
+          <dt class="col-4">授課教師</dt><dd class="col-8">{{ object.teacher|default:"—" }}</dd>
+        </dl>
+        <p class="text-danger">刪除後無法復原。</p>
+        <form method="post" class="d-flex gap-2">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">確定刪除</button>
+          <a class="btn btn-outline-secondary" href="{% url 'timetable' %}">取消</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
