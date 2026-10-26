@@ -1,6 +1,13 @@
 ## personal-timetable
 個人課表維護功能
 
+## 啟動專案
+uv sync
+uv run python manage.py migrate
+uv run python manage.py runserver
+
+開啟 http://127.0.0.1:8000/
+
 
 ## 帳戶確認
 Win+R
@@ -14,7 +21,7 @@ git push origin main
 git status
 確認哪些檔案被修改。
 
-git add backend/app.py
+git add Test/app.py
 git add README.md
 告訴 Git 要提交這支 Python 程式。
 
