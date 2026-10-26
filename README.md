@@ -1,8 +1,8 @@
-# personal-timetable
+## personal-timetable
 個人課表維護功能
 
 
-# 帳戶確認
+## 帳戶確認
 Win+R
 control /name Microsoft.CredentialManager
 如果有找到 git:https://github.com 或類似的 GitHub 認證 展開後點選 移除
@@ -10,7 +10,7 @@ control /name Microsoft.CredentialManager
 Vscode Ctrl+Shift+"~"
 git push origin main
 
-# 上傳檔案
+## 上傳檔案
 git status
 確認哪些檔案被修改。
 
