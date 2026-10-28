@@ -1,0 +1,27 @@
+{% extends "pages/base.html" %}
+
+{% block title %}課表總覽 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">課表總覽</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'course_list' %}?class={{ selected_class|urlencode }}">此年級課程清單</a>
+    <a class="btn btn-primary" href="{% url 'select_class' %}?class={{ selected_class|urlencode }}">選擇此年級</a>
+  </div>
+</div>
+
+<ul class="nav nav-pills mb-3">
+  {% for name in class_names %}
+    <li class="nav-item">
+      <a class="nav-link{% if name == selected_class %} active{% endif %}" href="?class={{ name|urlencode }}">{{ name }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+<p class="text-muted small">列出此年級所有課程（必修、選修）。深色格子是已加選的課；同一節有多門課時顯示「等 N 門」，滑鼠移上去可以看全部。</p>
+
+<div class="table-responsive">
+  {% include "pages/_timetable_grid.html" %}
+</div>
+{% endblock %}

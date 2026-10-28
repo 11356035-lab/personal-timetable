@@ -9,8 +9,7 @@
     .timetable th, .timetable td { vertical-align: middle; }
     .timetable .period-col { width: 8rem; }
     .timetable td.course { background: #e7f1ff; position: relative; }
-    .timetable td.clickable { cursor: pointer; }
-    .timetable td.clickable:hover { background: #cfe2ff; }
+    .timetable td.course.enrolled { background: #b6d4fe; }
     /* 課程內容浮在格子上、不佔版面，加入課程後表格大小不變 */
     .timetable .course-content {
       position: absolute; inset: 0; padding: .25rem .4rem;
@@ -40,11 +39,16 @@
   <nav class="navbar navbar-dark bg-primary mb-4">
     <div class="container">
       <a class="navbar-brand" href="{% url 'timetable' %}">個人課表</a>
+      <div class="navbar-nav flex-row gap-3">
+        <a class="nav-link" href="{% url 'timetable' %}">我的課表</a>
+        <a class="nav-link" href="{% url 'overview' %}">課表總覽</a>
+        <a class="nav-link" href="{% url 'course_list' %}">課程清單</a>
+      </div>
     </div>
   </nav>
   <main class="container pb-5">
     {% for message in messages %}
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <div class="alert alert-{% if message.level_tag == 'error' %}danger{% else %}{{ message.level_tag }}{% endif %} alert-dismissible fade show" role="alert">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="關閉"></button>
       </div>

@@ -1,0 +1,28 @@
+{% extends "pages/base.html" %}
+
+{% block title %}選擇年級 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card{% if enrolled %} border-danger{% endif %}">
+      <div class="card-body">
+        <h1 class="h4 mb-3">選擇「{{ class_name }}」</h1>
+        <p>將自動加入此年級的 {{ required_count }} 門必修課（專必、通必、一般；分組課程需自行選一組）。</p>
+        {% if enrolled %}
+          <p class="text-danger mb-1">目前課表上的 {{ enrolled|length }} 門課會先全部退選：</p>
+          <ul class="text-danger">
+            {% for course in enrolled %}<li>{{ course.name }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+        <form method="post" class="d-flex gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="class" value="{{ class_name }}">
+          <button type="submit" class="btn {% if enrolled %}btn-danger{% else %}btn-primary{% endif %}">確定</button>
+          <a class="btn btn-outline-secondary" href="{% url 'timetable' %}">取消</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-{# 課表表格；show_actions 為真時，點課程格子可進入編輯頁 #}
+{# 課表表格；每格是那一節的課程清單，有多門課時顯示第一門和總門數 #}
 <table class="table table-bordered bg-white text-center timetable">
   <thead class="table-light">
     <tr>
@@ -15,23 +15,23 @@
           第 {{ row.period }} 節<br>
           <small class="text-muted">{{ row.start_time }}–{{ row.end_time }}</small>
         </th>
-        {% for course in row.cells %}
-          {% if course %}
-            <td class="course{% if show_actions %} clickable{% endif %}"
-                title="{{ course.name }}{% if course.teacher %}　{{ course.teacher }}{% endif %}{% if course.classroom %}　{{ course.classroom }}{% endif %}{% if show_actions %}（點一下編輯）{% endif %}">
-              {# 內容浮在格子上，不影響表格大小 #}
-              <div class="course-content">
-                <div class="fw-bold">
-                  {% if show_actions %}
-                    <a class="stretched-link text-reset text-decoration-none" href="{% url 'course_update' course.pk %}">{{ course.name }}</a>
+        {% for cell in row.cells %}
+          {% if cell %}
+            {% with course=cell.0 %}
+              <td class="course{% if course.is_enrolled %} enrolled{% endif %}"
+                  title="{% for item in cell %}{{ item.name }}{% if item.teacher %}　{{ item.teacher }}{% endif %}{% if item.classroom %}　{{ item.classroom }}{% endif %}{% if not forloop.last %}&#10;{% endif %}{% endfor %}">
+                {# 內容浮在格子上，不影響表格大小 #}
+                <div class="course-content">
+                  <div class="fw-bold">{{ course.name }}</div>
+                  {% if cell|length > 1 %}
+                    <div class="text-muted">等 {{ cell|length }} 門</div>
                   {% else %}
-                    {{ course.name }}
+                    {% if course.teacher %}<div>{{ course.teacher }}</div>{% endif %}
+                    {% if course.classroom %}<div>{{ course.classroom }}</div>{% endif %}
                   {% endif %}
                 </div>
-                {% if course.teacher %}<div>{{ course.teacher }}</div>{% endif %}
-                {% if course.classroom %}<div>{{ course.classroom }}</div>{% endif %}
-              </div>
-            </td>
+              </td>
+            {% endwith %}
           {% else %}
             <td></td>
           {% endif %}

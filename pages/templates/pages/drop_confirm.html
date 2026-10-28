@@ -1,0 +1,33 @@
+{% extends "pages/base.html" %}
+
+{% block title %}退選課程 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h1 class="h4 mb-3">確定要退選這門課嗎？</h1>
+        <dl class="row mb-4">
+          <dt class="col-4">課程代碼</dt><dd class="col-8">{{ object.course.code }}</dd>
+          <dt class="col-4">課程名稱</dt><dd class="col-8">{{ object.course.name }}</dd>
+          <dt class="col-4">時間</dt>
+          <dd class="col-8">
+            {% for time in object.course.times.all %}
+              <div>{{ time }}（{{ time.start_time }}–{{ time.end_time }}）</div>
+            {% endfor %}
+          </dd>
+          <dt class="col-4">教室</dt><dd class="col-8">{{ object.course.classroom|default:"—" }}</dd>
+          <dt class="col-4">授課教師</dt><dd class="col-8">{{ object.course.teacher|default:"—" }}</dd>
+        </dl>
+        <form method="post" class="d-flex gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="btn btn-danger">確定退選</button>
+          <a class="btn btn-outline-secondary" href="{% url 'course_list' %}">取消</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

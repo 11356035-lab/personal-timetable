@@ -1,13 +1,30 @@
 from django.contrib import admin
 
-from .forms import CourseForm
-from .models import Course
+from .models import Course, CourseTime, Enrollment
+
+
+class CourseTimeInline(admin.TabularInline):
+    model = CourseTime
+    extra = 0
+    min_num = 1
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    # 用同一個表單，admin 裡新增也會檢查時間衝突
-    form = CourseForm
-    list_display = ["name", "weekday", "start_period", "end_period", "classroom", "teacher"]
-    list_filter = ["weekday"]
-    search_fields = ["name", "teacher", "classroom"]
+    inlines = [CourseTimeInline]
+    list_display = ["code", "name", "class_name", "teacher", "time_label", "classroom", "credits", "category"]
+    list_filter = ["class_name", "category"]
+    search_fields = ["code", "name", "teacher", "classroom"]
+
+    @admin.display(description="上課時間")
+    def time_label(self, course):
+        return course.time_label()
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("times")
+
+
+@admin.register(Enrollment)
+class EnrollmentAdmin(admin.ModelAdmin):
+    list_display = ["course", "created_at"]
+    search_fields = ["course__code", "course__name"]

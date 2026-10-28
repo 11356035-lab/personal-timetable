@@ -2,14 +2,40 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">本週課表</h1>
+  <h1 class="h3 mb-0">我的課表</h1>
   <div class="d-flex gap-2">
+    {% if has_courses %}
+      {# 已經有課時，選年級要先到確認頁 #}
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">重新選擇年級</button>
+        <ul class="dropdown-menu">
+          {% for name in class_names %}
+            <li><a class="dropdown-item" href="{% url 'select_class' %}?class={{ name|urlencode }}">{{ name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
     <a class="btn btn-outline-secondary" href="{% url 'timetable_print' %}">列印課表</a>
-    <a class="btn btn-primary" href="{% url 'course_create' %}">＋ 新增課程</a>
+    <a class="btn btn-primary" href="{% url 'course_list' %}">加選課程</a>
   </div>
 </div>
 
+{% if not has_courses %}
+  <div class="alert alert-info">
+    <p>目前還沒有加選任何課程。選擇年級後會自動加入該年級的必修課，之後可以到<a class="alert-link" href="{% url 'course_list' %}">課程清單</a>自由加退選。</p>
+    <div class="d-flex flex-wrap gap-2">
+      {% for name in class_names %}
+        <form method="post" action="{% url 'select_class' %}">
+          {% csrf_token %}
+          <input type="hidden" name="class" value="{{ name }}">
+          <button type="submit" class="btn btn-primary">{{ name }}</button>
+        </form>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
 <div class="table-responsive">
-  {% include "pages/_timetable_grid.html" with show_actions=True %}
+  {% include "pages/_timetable_grid.html" %}
 </div>
 {% endblock %}

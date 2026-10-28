@@ -1,0 +1,73 @@
+{% extends "pages/base.html" %}
+
+{% block title %}課程清單 - 個人課表{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">課程清單</h1>
+  <span class="text-muted">已選 {{ enrolled_count }} 門、{{ enrolled_credits|floatformat:"-1" }} 學分</span>
+</div>
+
+{# 依班級篩選 #}
+<ul class="nav nav-pills mb-3">
+  <li class="nav-item">
+    <a class="nav-link{% if not selected_class %} active{% endif %}" href="{% url 'course_list' %}">全部</a>
+  </li>
+  {% for name in class_names %}
+    <li class="nav-item">
+      <a class="nav-link{% if name == selected_class %} active{% endif %}" href="?class={{ name|urlencode }}">{{ name }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+<div class="table-responsive">
+  <table class="table table-hover bg-white align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>課程代碼</th>
+        <th>課程名稱</th>
+        <th>班級</th>
+        <th>授課教師</th>
+        <th>上課時間</th>
+        <th>教室</th>
+        <th class="text-end">學分</th>
+        <th>選修別</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for course in course_list %}
+        <tr{% if course.is_enrolled %} class="table-primary"{% endif %}>
+          <td>{{ course.code }}</td>
+          <td>{{ course.name }}</td>
+          <td>{{ course.class_name }}</td>
+          <td>{{ course.teacher }}</td>
+          <td class="text-nowrap">
+            {% for time in course.times.all %}<div>{{ time }}</div>{% endfor %}
+          </td>
+          <td>{{ course.classroom }}</td>
+          <td class="text-end">{{ course.credits|floatformat:"-1" }}</td>
+          <td>{{ course.category }}</td>
+          <td class="text-end text-nowrap">
+            {% if course.is_enrolled %}
+              <a class="btn btn-sm btn-outline-danger" href="{% url 'course_drop' course.pk %}?next={{ request.get_full_path|urlencode }}">退選</a>
+            {% elif course.conflict %}
+              <span class="d-inline-block" tabindex="0" title="與「{{ course.conflict.name }}」時間衝突">
+                <button type="button" class="btn btn-sm btn-secondary" disabled>時間衝突</button>
+              </span>
+            {% else %}
+              <form method="post" action="{% url 'course_enroll' course.pk %}" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn btn-sm btn-primary">加選</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center text-muted">沒有課程資料，請先執行 import_courses 匯入。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
