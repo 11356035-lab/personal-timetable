@@ -31,5 +31,5 @@ git add -A
 git commit -m "Update Python code"
 記錄這一次的修改。
 
-git push origin main
+
 將本機已提交的修改上傳到 GitHub。
