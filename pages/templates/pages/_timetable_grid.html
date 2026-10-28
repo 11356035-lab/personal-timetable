@@ -18,7 +18,7 @@
         {% for course in row.cells %}
           {% if course %}
             <td class="course{% if show_actions %} clickable{% endif %}"
-                title="{{ course.name }}　{{ course.start_time }}–{{ course.end_time }}{% if course.place %}　{{ course.place }}{% endif %}{% if show_actions %}（點一下編輯）{% endif %}">
+                title="{{ course.name }}{% if course.teacher %}　{{ course.teacher }}{% endif %}{% if course.classroom %}　{{ course.classroom }}{% endif %}{% if show_actions %}（點一下編輯）{% endif %}">
               {# 內容浮在格子上，不影響表格大小 #}
               <div class="course-content">
                 <div class="fw-bold">
@@ -28,8 +28,8 @@
                     {{ course.name }}
                   {% endif %}
                 </div>
-                <div class="text-muted">{{ course.start_time }}–{{ course.end_time }}</div>
-                {% if course.place %}<div>{{ course.place }}</div>{% endif %}
+                {% if course.teacher %}<div>{{ course.teacher }}</div>{% endif %}
+                {% if course.classroom %}<div>{{ course.classroom }}</div>{% endif %}
               </div>
             </td>
           {% else %}

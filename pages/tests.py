@@ -22,17 +22,18 @@ class TimetableViewTests(TestCase):
         Course.objects.create(**course_data())
         response = self.client.get(reverse("timetable"))
         # 第 2–3 節的課，兩格都要顯示
-        self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+        self.assertContains(response, "<div>王老師</div>", count=2, html=True)
+        self.assertContains(response, "<div>A101</div>", count=2, html=True)
         self.assertNotContains(response, "教室：")
         self.assertNotContains(response, "教師：")
-        self.assertContains(response, '<div class="text-muted">09:10–11:00</div>', count=2, html=True)
+        # 格子裡不顯示時間
+        self.assertNotContains(response, "09:10–11:00")
         self.assertNotContains(response, "rowspan")
 
-    def test_place_skips_blank_fields(self):
-        course = Course(**course_data(teacher=""))
-        self.assertEqual(course.place, "A101")
-        course.classroom = ""
-        self.assertEqual(course.place, "")
+    def test_blank_teacher_and_classroom_not_shown(self):
+        Course.objects.create(**course_data(teacher="", classroom=""))
+        response = self.client.get(reverse("timetable"))
+        self.assertNotContains(response, "<div></div>", html=True)
 
     def test_cell_links_to_edit_without_buttons(self):
         course = Course.objects.create(**course_data())
@@ -45,7 +46,7 @@ class TimetableViewTests(TestCase):
         for url in (reverse("timetable"), reverse("timetable_print")):
             response = self.client.get(url)
             self.assertNotContains(response, "午休")
-            self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+            self.assertContains(response, "<div>王老師</div>", count=2, html=True)
 
 
 class TimetablePrintViewTests(TestCase):
@@ -54,7 +55,7 @@ class TimetablePrintViewTests(TestCase):
         response = self.client.get(reverse("timetable_print"))
         self.assertContains(response, "星期一")
         self.assertContains(response, "第 9 節")
-        self.assertContains(response, "<div>A101 王老師</div>", count=2, html=True)
+        self.assertContains(response, "<div>王老師</div>", count=2, html=True)
         self.assertNotContains(response, reverse("course_update", args=[course.pk]))
         self.assertNotContains(response, reverse("course_delete", args=[course.pk]))
 

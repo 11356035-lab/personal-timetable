@@ -61,11 +61,6 @@ class Course(models.Model):
     def end_time(self):
         return PERIODS[self.end_period][1]
 
-    @property
-    def place(self):
-        """教室和教師，中間空一格；沒填的不顯示"""
-        return " ".join(part for part in (self.classroom, self.teacher) if part)
-
     def period_label(self):
         if self.start_period == self.end_period:
             return f"第 {self.start_period} 節"
