@@ -61,11 +61,18 @@ class TimetableViewTests(TestCase):
         self.assertNotContains(response, "<div></div>", html=True)
 
     def test_starts_empty(self):
-        create_course(**course_data())
+        create_course(**course_data(class_name="一年甲班"))
         response = self.client.get(reverse("timetable"))
         self.assertNotContains(response, "微積分")
         self.assertContains(response, "目前還沒有加選任何課程")
         self.assertContains(response, reverse("course_list"))
+        self.assertNotContains(response, "import_courses")
+
+    def test_no_course_data_shows_import_hint(self):
+        response = self.client.get(reverse("timetable"))
+        self.assertContains(response, "還沒有課程資料")
+        self.assertContains(response, "uv run python manage.py import_courses")
+        self.assertNotContains(response, "目前還沒有加選任何課程")
 
     def test_enroll_then_drop_updates_timetable(self):
         course = create_course(**course_data())

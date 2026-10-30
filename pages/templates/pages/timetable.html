@@ -20,7 +20,13 @@
   </div>
 </div>
 
-{% if not has_courses %}
+{% if not class_names %}
+  {# 資料庫還沒有課程，年級按鈕會是空的 #}
+  <div class="alert alert-warning">
+    <p class="mb-2">還沒有課程資料，所以沒有年級可以選。請在專案資料夾執行下面的指令匯入課程，再重新整理網頁：</p>
+    <code>uv run python manage.py import_courses</code>
+  </div>
+{% elif not has_courses %}
   <div class="alert alert-info">
     <p>目前還沒有加選任何課程。選擇年級後會自動加入該年級的必修課，之後可以到<a class="alert-link" href="{% url 'course_list' %}">課程清單</a>自由加退選。</p>
     <div class="d-flex flex-wrap gap-2">

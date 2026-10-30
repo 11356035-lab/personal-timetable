@@ -20,11 +20,13 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 安裝完請關掉終端機再重新開啟，讓 `uv` 指令生效。
 
 ### 2. 下載專案並啟動
+以下指令都要在 `personal-timetable` 資料夾裡執行（`cd` 之後）。
 ```
-git clone <本專案網址>
+git clone https://github.com/11356035-lab/personal-timetable.git
 cd personal-timetable
 uv sync
 uv run python manage.py migrate
+uv run python manage.py showmigrations pages
 uv run python manage.py import_courses
 uv run python manage.py runserver
 ```
@@ -32,8 +34,29 @@ uv run python manage.py runserver
 開啟 http://127.0.0.1:8000/
 
 - `uv sync` 會自動安裝 Django；電腦沒有 Python 3.12 以上時，uv 也會自動下載。
-- `import_courses` 會從 `Data/courses.csv` 匯入 69 門課程，重複執行不會產生重複資料。
+- `migrate` 會建立資料表。資料庫 `db.sqlite3` 不在 Git 裡，**每個人 clone 後都要自己執行一次**。
+- `showmigrations pages` 用來確認 migrate 成功：`0001`～`0003` 前面都要是 `[X]`。
+- `import_courses` 會從 `Data/courses.csv` 匯入 69 門課程，看到「課程匯入完成：新增 69 門」就成功了；重複執行不會產生重複資料。
 - 不需要建立任何帳號。
+
+### 從舊版更新
+之前已經 clone 過的人，在專案資料夾執行：
+```
+git pull
+uv sync
+uv run python manage.py migrate
+uv run python manage.py import_courses
+uv run python manage.py runserver
+```
+舊版自己新增的課程沒有課程代碼，`migrate` 時會自動清掉，改用匯入的固定課程資料。
+
+## 常見問題
+- **開網站出現 `OperationalError: no such table: pages_coursetime`**
+  資料表沒有建好。在專案資料夾執行 `uv run python manage.py migrate`，再用 `showmigrations pages` 確認都是 `[X]`。
+- **`migrate` 出現 `UNIQUE constraint failed: new__pages_course.code`**
+  舊版資料庫的問題，請先 `git pull` 取得最新版再執行 `migrate`。還是失敗的話，把舊資料庫改名備份（`Rename-Item db.sqlite3 db.old.sqlite3`），再重新執行 `migrate` 和 `import_courses`。
+- **首頁看不到年級按鈕，出現「還沒有課程資料」**
+  還沒匯入課程，執行 `uv run python manage.py import_courses` 後重新整理網頁。
 
 ## Demo 流程
 1. **我的課表**：一開始是空白的，按「五專資管一年甲班」→ 自動加入 15 門必修課。

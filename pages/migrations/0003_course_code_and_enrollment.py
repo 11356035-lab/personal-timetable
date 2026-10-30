@@ -4,6 +4,12 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
+def delete_old_courses(apps, schema_editor):
+    """舊版使用者自己新增的課程沒有課程代碼，新增不可重複的 code 欄位時會全部變成 ''
+    而失敗（UNIQUE constraint failed）。新版課程改由 import_courses 匯入，舊資料用不到，先清掉"""
+    apps.get_model('pages', 'Course').objects.all().delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -11,6 +17,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(delete_old_courses, migrations.RunPython.noop),
         migrations.CreateModel(
             name='CourseTime',
             fields=[
