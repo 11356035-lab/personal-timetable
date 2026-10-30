@@ -28,7 +28,7 @@
   </div>
 {% elif not has_courses %}
   <div class="alert alert-info">
-    <p>目前還沒有加選任何課程。選擇年級後會自動加入該年級的必修課，之後可以到<a class="alert-link" href="{% url 'course_list' %}">課程清單</a>自由加退選。</p>
+    <p>請選擇你的年級<a class="alert-link" href="{% url 'course_list' %}"></a></p>  
     <div class="d-flex flex-wrap gap-2">
       {% for name in class_names %}
         <form method="post" action="{% url 'select_class' %}">
