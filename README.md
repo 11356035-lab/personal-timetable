@@ -105,3 +105,10 @@ git commit -m "Update Python code"
 
 git push origin main
 將本機已提交的修改上傳到 GitHub。
+
+### 組員名單
+11356010 朱俊豪
+11356011 張承凱
+11356013 邱杰暘
+11356035 潘九成
+11356048 林甡寬
